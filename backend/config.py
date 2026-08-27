@@ -5,8 +5,9 @@ load_dotenv()
 
 # --- Groq LLM ---
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-LLM_MODEL = "llama-3.1-70b-versatile"
-LLM_TEMPERATURE = 0.1  # Low temperature for factual, grounded answers
+# LLM Settings
+LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
+LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))  # Low temperature for factual, grounded answers
 
 # --- Embedding Model (runs locally, no API key needed) ---
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"

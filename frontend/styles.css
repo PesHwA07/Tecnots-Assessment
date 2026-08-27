@@ -844,3 +844,5 @@ body {
         max-width: 85%;
     }
 }
+
+[hidden] { display: none !important; }

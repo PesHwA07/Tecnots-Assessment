@@ -52,8 +52,10 @@ async def upload_document(file: UploadFile = File(...)):
         with open(tmp_path, "wb") as f:
             f.write(content)
 
-        # Run ingestion pipeline
-        doc_info = ingest_document(tmp_path, file.filename)
+        # Run ingestion pipeline in a threadpool to prevent blocking the event loop
+        import asyncio
+        doc_info = await asyncio.to_thread(ingest_document, tmp_path, file.filename)
+        
         return {
             "status": "success",
             "message": f"'{file.filename}' uploaded and indexed successfully ({doc_info.chunk_count} chunks created).",
