@@ -1,3 +1,4 @@
+from __future__ import annotations
 from backend.ingestion import get_embedding_model, get_collection
 from backend.models import SourceCitation
 from backend.config import (

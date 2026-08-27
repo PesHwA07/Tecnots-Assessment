@@ -1,3 +1,4 @@
+from __future__ import annotations
 import uuid
 from backend.config import MAX_CONVERSATION_HISTORY
 
