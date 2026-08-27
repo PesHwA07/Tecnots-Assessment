@@ -231,7 +231,32 @@ async def query_documents_stream(request: QueryRequest):
         ]
         add_turn(session_id, question, full_answer, sources_for_history)
 
-        yield f"data: {json.dumps({'type': 'done'})}\n\n"
+        # --- Post-stream conflict detection ---
+        # Check if chunks come from multiple documents (conflict is only
+        # possible across different documents)
+        unique_docs = set(c.get("doc_name", "") for c in chunks) if chunks else set()
+        has_conflict = False
+        conflicts = []
+
+        if len(unique_docs) > 1:
+            # Run the structured (non-streaming) generation to detect conflicts
+            try:
+                structured_result = generate_answer(rewritten_query, chunks, confidence, session_id)
+                has_conflict = structured_result.get("has_conflict", False)
+                if has_conflict:
+                    conflicts = structured_result.get("conflicts", [])
+            except Exception:
+                # If structured call fails, fall back to text-based detection
+                conflict_markers = ["⚠️", "sources disagree", "conflicting", "contradiction"]
+                answer_lower = full_answer.lower()
+                has_conflict = any(marker in answer_lower for marker in conflict_markers)
+
+        done_event = {
+            "type": "done",
+            "has_conflict": has_conflict,
+            "conflicts": conflicts,
+        }
+        yield f"data: {json.dumps(done_event)}\n\n"
 
     return StreamingResponse(
         event_stream(),

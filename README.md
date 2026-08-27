@@ -42,7 +42,7 @@ Open **http://localhost:8000** in your browser.
 | Component | Technology | Why |
 |-----------|------------|-----|
 | **Backend Framework** | FastAPI | Async support, auto-generated API docs, built-in validation via Pydantic |
-| **LLM** | Groq API (Llama 3.1 70B) | Free tier, extremely fast inference (~500 tok/s), strong reasoning for conflict detection and synthesis |
+| **LLM** | Groq API (via OpenAI-compatible endpoint) | Free tier, extremely fast inference (~500 tok/s), strong reasoning for conflict detection and synthesis |
 | **Embedding Model** | `all-MiniLM-L6-v2` (sentence-transformers) | Runs locally (no API key), 384-dim vectors, good semantic quality for document retrieval |
 | **Vector Store** | ChromaDB | Lightweight, persistent, cosine similarity search, metadata filtering — no infrastructure setup |
 | **PDF Parsing** | pypdf | Pure Python, no compilation needed, reliable text extraction with page-level tracking |
@@ -157,3 +157,4 @@ Assessment/
 3. **Groq free tier limits**: Rate-limited to ~30 RPM. Sufficient for demo use.
 4. **Embedding model size**: `all-MiniLM-L6-v2` (22M params) trades some accuracy for speed and zero-cost local execution. Larger models like `all-mpnet-base-v2` would improve retrieval quality.
 5. **Conflict detection via LLM**: More flexible than heuristic approaches but depends on prompt adherence. Structured JSON output mitigates inconsistency.
+6. **Document scoping by filename**: Queries like "in the 2024 handbook only" work only if a file is literally named something like `2024_handbook.pdf`. Natural-language document references without the exact filename are not resolved.

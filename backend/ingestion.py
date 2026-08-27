@@ -8,6 +8,7 @@ from sentence_transformers import SentenceTransformer
 from backend.config import (
     EMBEDDING_MODEL, CHROMA_PERSIST_DIR, CHROMA_COLLECTION_NAME,
     CHUNK_SIZE, CHUNK_OVERLAP, MIN_CHUNK_LENGTH, ALLOWED_EXTENSIONS,
+    MAX_FILE_SIZE_MB,
 )
 from backend.models import DocumentInfo, ChunkMetadata
 
@@ -232,7 +233,7 @@ def embed_and_index(chunks: list[dict]) -> int:
     texts = [c["text"] for c in chunks]
     embeddings = model.encode(texts, show_progress_bar=False).tolist()
 
-    ids = [f"{chunks[0]['doc_id']}_{i}" for i in range(len(chunks))]
+    ids = [f"{c['doc_id']}_{c['chunk_index']}" for c in chunks]
     metadatas = []
     for c in chunks:
         meta = {
@@ -268,8 +269,8 @@ def validate_file(filename: str, file_size: int) -> str | None:
         return f"Unsupported file type '{ext}'. Please upload PDF, TXT, or MD files."
     if file_size == 0:
         return "The uploaded file is empty."
-    if file_size > 50 * 1024 * 1024:
-        return f"File exceeds the {50}MB size limit."
+    if file_size > MAX_FILE_SIZE_MB * 1024 * 1024:
+        return f"File exceeds the {MAX_FILE_SIZE_MB}MB size limit."
     return None
 
 
