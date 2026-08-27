@@ -1,15 +1,16 @@
 import json
 import re
-from groq import Groq
-from backend.config import GROQ_API_KEY, LLM_MODEL, LLM_TEMPERATURE
+from google import genai
+from google.genai import types
+from backend.config import GEMINI_API_KEY, LLM_MODEL, LLM_TEMPERATURE
 from backend.conversation import build_coreference_prompt, get_conversation_history
 
 
-def _get_groq_client() -> Groq:
-    """Get a Groq client instance."""
-    if not GROQ_API_KEY:
-        raise ValueError("GROQ_API_KEY is not set. Please add it to your .env file.")
-    return Groq(api_key=GROQ_API_KEY)
+def _get_gemini_client() -> genai.Client:
+    """Get a Gemini client instance."""
+    if not GEMINI_API_KEY:
+        raise ValueError("GEMINI_API_KEY is not set. Please add it to your .env file.")
+    return genai.Client(api_key=GEMINI_API_KEY)
 
 
 SYSTEM_PROMPT = """You are a document Q&A assistant. Your ONLY job is to answer questions using the provided document passages below. Follow these rules strictly:
@@ -87,18 +88,18 @@ def rewrite_follow_up(session_id: str, question: str) -> str:
     if prompt is None:
         return question
 
-    client = _get_groq_client()
+    client = _get_gemini_client()
     try:
-        response = client.chat.completions.create(
+        response = client.models.generate_content(
             model=LLM_MODEL,
-            messages=[
-                {"role": "system", "content": "You rewrite follow-up questions into standalone questions. Return ONLY the rewritten question."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.0,
-            max_tokens=200,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                system_instruction="You rewrite follow-up questions into standalone questions. Return ONLY the rewritten question.",
+                temperature=0.0,
+                max_output_tokens=200,
+            ),
         )
-        rewritten = response.choices[0].message.content.strip()
+        rewritten = response.text.strip()
         # Sanity check: if the rewritten query is too different or empty, use original
         if rewritten and len(rewritten) > 3:
             return rewritten
@@ -115,7 +116,7 @@ def generate_answer(
     session_id: str | None = None,
 ) -> dict:
     """
-    Generate a grounded answer from retrieved chunks using Groq LLM.
+    Generate a grounded answer from retrieved chunks using Gemini LLM.
     
     Returns a dict with: answer, has_conflict, conflicts, highlighted_spans, answerable
     """
@@ -128,7 +129,7 @@ def generate_answer(
             "answerable": False,
         }
 
-    client = _get_groq_client()
+    client = _get_gemini_client()
     context = _build_context(chunks)
 
     # Build the user message
@@ -140,31 +141,39 @@ QUESTION: {question}
 
 Remember: Answer ONLY from the passages above. If the answer is not there, say so. If sources disagree, present all conflicting values. Respond in the specified JSON format."""
 
-    # Include conversation context for follow-up awareness
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    # Build conversation contents
+    contents = []
 
     # Add recent conversation history for context
     if session_id:
         history = get_conversation_history(session_id)
         recent = history[-(4):]  # last 2 Q&A pairs for context
         for turn in recent:
-            messages.append({
-                "role": turn["role"],
-                "content": turn["content"] if turn["role"] == "user" else turn["content"][:500],
-            })
+            role = "user" if turn["role"] == "user" else "model"
+            contents.append(
+                types.Content(
+                    role=role,
+                    parts=[types.Part(text=turn["content"] if turn["role"] == "user" else turn["content"][:500])],
+                )
+            )
 
-    messages.append({"role": "user", "content": user_message})
+    contents.append(
+        types.Content(role="user", parts=[types.Part(text=user_message)])
+    )
 
     try:
-        response = client.chat.completions.create(
+        response = client.models.generate_content(
             model=LLM_MODEL,
-            messages=messages,
-            temperature=LLM_TEMPERATURE,
-            max_tokens=2000,
-            response_format={"type": "json_object"},
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                temperature=LLM_TEMPERATURE,
+                max_output_tokens=2000,
+                response_mime_type="application/json",
+            ),
         )
 
-        raw_response = response.choices[0].message.content.strip()
+        raw_response = response.text.strip()
         result = json.loads(raw_response)
 
         # Ensure required fields exist
@@ -202,17 +211,18 @@ def generate_answer_stream(
     session_id: str | None = None,
 ):
     """
-    Stream a grounded answer token-by-token using Groq's streaming API.
+    Stream a grounded answer token-by-token using Gemini's streaming API.
     Yields string chunks as they arrive.
     
     Note: Streaming mode returns plain text (not JSON) for real-time rendering.
-    Conflict detection and structured output are handled in the non-streaming path.
+    Conflict detection and highlighted spans are handled via a post-stream
+    structured call in the SSE done event.
     """
     if not chunks:
         yield "I could not find any relevant information in the uploaded documents to answer this question."
         return
 
-    client = _get_groq_client()
+    client = _get_gemini_client()
     context = _build_context(chunks)
 
     # Simpler prompt for streaming (plain text output)
@@ -234,31 +244,39 @@ QUESTION: {question}
 
 Answer using only the passages above. Cite document names inline."""
 
-    messages = [{"role": "system", "content": streaming_system}]
+    # Build conversation contents
+    contents = []
 
     if session_id:
         history = get_conversation_history(session_id)
         recent = history[-(4):]
         for turn in recent:
-            messages.append({
-                "role": turn["role"],
-                "content": turn["content"] if turn["role"] == "user" else turn["content"][:500],
-            })
+            role = "user" if turn["role"] == "user" else "model"
+            contents.append(
+                types.Content(
+                    role=role,
+                    parts=[types.Part(text=turn["content"] if turn["role"] == "user" else turn["content"][:500])],
+                )
+            )
 
-    messages.append({"role": "user", "content": user_message})
+    contents.append(
+        types.Content(role="user", parts=[types.Part(text=user_message)])
+    )
 
     try:
-        stream = client.chat.completions.create(
+        response = client.models.generate_content_stream(
             model=LLM_MODEL,
-            messages=messages,
-            temperature=LLM_TEMPERATURE,
-            max_tokens=2000,
-            stream=True,
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=streaming_system,
+                temperature=LLM_TEMPERATURE,
+                max_output_tokens=2000,
+            ),
         )
 
-        for chunk in stream:
-            if chunk.choices[0].delta.content:
-                yield chunk.choices[0].delta.content
+        for chunk in response:
+            if chunk.text:
+                yield chunk.text
 
     except Exception as e:
         yield f"\n\nError: {str(e)}"

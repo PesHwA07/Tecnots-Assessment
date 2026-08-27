@@ -3,10 +3,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# --- Groq LLM ---
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-# LLM Settings
-LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
+# --- Gemini LLM ---
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+LLM_MODEL = os.getenv("LLM_MODEL", "gemini-3.6-flash")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))  # Low temperature for factual, grounded answers
 
 # --- Embedding Model (runs locally, no API key needed) ---

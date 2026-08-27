@@ -3,6 +3,6 @@ uvicorn
 pypdf
 sentence-transformers
 chromadb
-groq
+google-genai
 python-multipart
 python-dotenv
