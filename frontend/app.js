@@ -255,12 +255,25 @@ async function handleSendQuestion() {
                             const conflictHtml = buildConflictBanner(event.conflicts);
                             const messageContent = answerDiv.querySelector('.message-content');
                             if (messageContent) {
-                                // Insert conflict banner before the answer text
                                 const answerText = messageContent.querySelector('.answer-text');
                                 if (answerText) {
                                     answerText.insertAdjacentHTML('beforebegin', conflictHtml);
                                 }
                             }
+                        }
+
+                        // Apply highlighted spans to source passages
+                        if (event.highlighted_spans && event.highlighted_spans.length > 0 && answerDiv) {
+                            const sourcePassages = answerDiv.querySelectorAll('.source-passage');
+                            sourcePassages.forEach(passageEl => {
+                                let html = passageEl.innerHTML;
+                                for (const span of event.highlighted_spans) {
+                                    const escaped = escapeHtml(span);
+                                    const regex = new RegExp(escapeRegex(escaped), 'gi');
+                                    html = html.replace(regex, `<mark>${escaped}</mark>`);
+                                }
+                                passageEl.innerHTML = html;
+                            });
                         }
                     }
                 } catch (parseErr) {
