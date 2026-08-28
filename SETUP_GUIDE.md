@@ -10,6 +10,7 @@ A step-by-step guide to get the AI Document Q&A Knowledge Assistant running on y
 
 - **Python 3.10+** installed ([download](https://www.python.org/downloads/))
 - **Git** installed ([download](https://git-scm.com/downloads))
+- **Node.js 18+** installed *(only if you plan to modify the React frontend)* ([download](https://nodejs.org/))
 - A **Gemini API key** (free, no credit card) — get one at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
 
 ### Step 2: Clone the Repository
@@ -106,37 +107,39 @@ Navigate to **http://localhost:8000** in your browser.
 
 ---
 
-## 🎯 How to Use
+## 🎯 How to Use the React Interface
 
-### 1. Upload Documents
-- Click **"Upload Documents"** in the sidebar
-- Select one or more files (PDF, TXT, or MD)
-- Wait for processing to complete
+The new Corroborate UI offers a multi-panel layout for advanced research:
 
-### 2. Ask Questions
-- Type your question in the chat input
-- Press **Enter** or click the send button
-- The answer streams in real-time with source citations
+### 1. Document Library (Upload)
+- Navigate to the **Document Library** via the left sidebar.
+- Click **"Upload Documents"** (or use the attach icon in the Research Hub).
+- Select one or more files (PDF, TXT, or MD) or drag-and-drop them.
+- Wait for the indexing process to complete. Documents will appear in the library and the "Active Sources" panel.
 
-### 3. Explore Sources
-- Click **"X sources cited"** to expand source passages
-- Each source shows the document name, page number, and relevant text
-- Key phrases are highlighted with a purple accent
+### 2. Research Hub (Ask Questions)
+- Navigate to the **Research Hub**.
+- Type your question in the chat input and press **Enter**.
+- The AI will stream the answer in real-time, displaying its reasoning steps, confidence level, and source citations.
+
+### 3. Verify Citations & Conflicts
+- Click any **Source Chip** below an answer to open the **Source Inspector**. This highlights the exact extracted snippet in context.
+- If the AI detects a contradiction between documents, a **Conflict Detected** banner will appear.
+- Click **"Open Conflict Inspector"** to view the **Conflict Reports** tab, which displays the conflicting claims side-by-side.
 
 ### 4. Test Edge Cases
-Try these to see the system's robustness:
+Try these scenarios to see the system's robustness:
 
 | Test | What to Do |
 |------|-----------|
-| **No documents** | Ask a question before uploading anything |
-| **Out-of-scope question** | Upload a tech doc, then ask about cooking |
+| **No documents** | Ask a question before uploading anything. |
 | **Follow-up question** | Ask "What is X?", then ask "How does it work?" |
-| **Conflicting sources** | Upload two docs with different answers to the same question |
-| **Empty file** | Try uploading an empty PDF |
-| **Short question** | Type just "hi" (send button stays disabled) |
+| **Conflicting sources** | Upload two docs with different answers to the same question (e.g., one says 30 days, one says 60 days). |
+| **Document Scoping** | Upload `Q3_Report.pdf` and `Q4_Report.pdf`. Ask: "What was the revenue according to Q3_Report?" |
 
 ### 5. Export Session
-- Click **"Export Session"** in the sidebar to download the full Q&A as Markdown
+- Navigate to **Settings** (or use the export button in the sidebar).
+- Choose **Export Session** to download the full Q&A conversation, citations, and conflict reports as a structured Markdown or JSON file.
 
 ---
 
@@ -156,8 +159,9 @@ All settings can be overridden via environment variables in `.env`:
 
 | Problem | Solution |
 |---------|----------|
-| `GEMINI_API_KEY is not set` | Make sure `.env` exists and contains your key |
-| `ModuleNotFoundError` | Run `pip install -r requirements.txt` again |
-| Port 8000 already in use | Use `--port 8001` or kill the process on 8000 |
-| First query is slow | Normal — embedding model loads on first use (~10s) |
-| Docker build fails | Ensure Docker Desktop is running |
+| `GEMINI_API_KEY is not set` | Make sure `.env` exists and contains your key. |
+| `ModuleNotFoundError` | Run `pip install -r requirements.txt` again. |
+| Port 8000 already in use | Use `--port 8001` or kill the process on port 8000. |
+| First query is slow | Normal — the embedding model loads into memory on first use (~10s). |
+| React UI looks broken | Ensure the `frontend-dist/` directory exists. If not, cd to `corroborate/`, run `npm install`, then `npx vite build`. |
+| Docker build fails | Ensure Docker Desktop is running and you have sufficient disk space. |
