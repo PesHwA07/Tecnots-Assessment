@@ -14,6 +14,7 @@ from backend.models import QueryRequest, QueryResponse, SourceCitation, Conflict
 from backend.ingestion import (
     ingest_document, get_all_documents, get_document,
     remove_document, validate_file, get_collection,
+    rebuild_document_registry,
 )
 from backend.retrieval import retrieve_and_rank, chunks_to_citations
 from backend.generation import generate_answer, generate_answer_stream, rewrite_follow_up
@@ -33,6 +34,12 @@ app.add_middleware(
 
 # Ensure upload directory exists
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Rebuild document registry from ChromaDB on server start."""
+    rebuild_document_registry()
 
 
 # ========== Document Routes ==========
