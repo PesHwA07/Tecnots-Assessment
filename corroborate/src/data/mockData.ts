@@ -1,4 +1,4 @@
-import { DocumentItem, ConflictItem, AnalysisHistoryItem, TeamAnnotation } from '../types';
+import { DocumentItem, ConflictItem, AnalysisHistoryItem } from '../types';
 
 export const INITIAL_DOCUMENTS: DocumentItem[] = [
   {
@@ -382,28 +382,5 @@ The vendor's liability cap remains intact at **$2M** as stipulated in Section 4.
         activeSourceNames: ['Vendor_Security_Addendum.txt']
       }
     ]
-  }
-];
-
-export const INITIAL_TEAM_ANNOTATIONS: TeamAnnotation[] = [
-  {
-    id: 'ann-1',
-    author: 'Elena Rostova',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAzrpku5fw78xfdFVzEIFG7yFGvtr9gXSrJLW8PMM_uOwNPDPGDdO0ABfTUQDmh3VZYpKuLP7oX9FfXmS6zgOeNMfQQl34hvfyG_pbEXbKdalHvcuwuoWqOaw5olKAlQlgsAeZfzc8amXvVvK2PtgdprrMaHenXheBED4Q5dmoAbxuMh0VmYqYNaz_cBbogVDAbZOZUT30u8L_Ve6QAoZFBxJ9vXdYmmLgNioZ7-ScMQZS1DEv9fpgyeA',
-    role: 'Principal Legal Counsel',
-    timestamp: 'Today at 10:24 AM',
-    targetRef: 'Conflict: Cure Periods',
-    comment: 'Flagged for General Counsel review. We must insist on Acme MSA Section 4.2 prevailing over standard SLA cure clauses.',
-    status: 'open'
-  },
-  {
-    id: 'ann-2',
-    author: 'Marcus Vance',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDLD55c5SPLWPi2a_Fmx2vW89f1bkDFfyJn2rs59P2Q2z9QI13ohqAq62P30Qj5fXXliUZh267kBuZVjyE0gK8DtbF94YZOcYTux32eHrVczuSpW71MxtqnX2iwf1lzxHsSK4eMjJnerrcMrjPSuhcOTnHREuTY5_1Fn9ZIYkAJDzec2G6RlvphmDH5u9lObNHYDh2VZ78sD0_AL6Zg0PehQgUaOGjyrwrxPZ89WyXLHx06yu7s0FxpXQ',
-    role: 'Lead Financial Auditor',
-    timestamp: 'Yesterday at 4:18 PM',
-    targetRef: 'Conflict: Q3 Revenue',
-    comment: 'Confirmed with external audit firm: the $14.2M in Doc A includes the $2.6M EMEA supply chain write-down. Shareholder report was published before reconciliation.',
-    status: 'resolved'
   }
 ];

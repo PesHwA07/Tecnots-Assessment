@@ -11,7 +11,6 @@ import {
 } from './types';
 import {
   INITIAL_CONFLICTS,
-  INITIAL_TEAM_ANNOTATIONS,
 } from './data/mockData';
 import { SideNavBar } from './components/SideNavBar';
 import { TopAppBar } from './components/TopAppBar';
@@ -19,7 +18,6 @@ import { DocumentLibrary } from './components/DocumentLibrary';
 import { ResearchHub } from './components/ResearchHub';
 import { ConflictReports } from './components/ConflictReports';
 import { AnalysisHistory } from './components/AnalysisHistory';
-import { TeamView } from './components/TeamView';
 import { UploadModal } from './components/UploadModal';
 import { DocumentViewerModal } from './components/DocumentViewerModal';
 import { SettingsModal } from './components/SettingsModal';
@@ -79,7 +77,6 @@ export const App: React.FC = () => {
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [conflicts, setConflicts] = useState<ConflictItem[]>(INITIAL_CONFLICTS);
   const [history, setHistory] = useState<AnalysisHistoryItem[]>([]);
-  const [teamAnnotations, setTeamAnnotations] = useState<TeamAnnotation[]>(INITIAL_TEAM_ANNOTATIONS);
 
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [sessionId, setSessionId] = useState<string>('');
@@ -322,26 +319,6 @@ export const App: React.FC = () => {
     fetchDocuments().then(setDocuments);
   };
 
-  const handleAddAnnotation = (targetRef: string, comment: string) => {
-    const newAnn: TeamAnnotation = {
-      id: 'ann-' + Date.now(),
-      author: 'Research Analyst',
-      avatar: '',
-      role: 'Analyst',
-      timestamp: 'Just now',
-      targetRef,
-      comment,
-      status: 'open',
-    };
-    setTeamAnnotations([newAnn, ...teamAnnotations]);
-  };
-
-  const handleToggleAnnotationStatus = (id: string) => {
-    setTeamAnnotations((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: a.status === 'open' ? 'resolved' : 'open' } : a))
-    );
-  };
-
   const handleExportSession = (format: 'json' | 'md') => {
     let content = '';
     let filename = `corroborate_session_${Date.now()}.${format}`;
@@ -398,13 +375,7 @@ export const App: React.FC = () => {
 
         {/* View Router */}
         <main className="flex-1 overflow-y-auto min-w-0 relative">
-          {currentSubTab === 'team-view' ? (
-            <TeamView
-              annotations={teamAnnotations}
-              onAddAnnotation={handleAddAnnotation}
-              onToggleStatus={handleToggleAnnotationStatus}
-            />
-          ) : currentMainTab === 'document-library' ? (
+          {currentMainTab === 'document-library' ? (
             <DocumentLibrary
               documents={documents}
               onUploadFiles={handleUploadFiles}

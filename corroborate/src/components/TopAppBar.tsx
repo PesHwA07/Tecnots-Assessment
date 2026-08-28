@@ -75,19 +75,6 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             )}
           </button>
 
-          <button
-            onClick={() => onSelectSubTab('team-view')}
-            className={`px-3 py-5 text-sm font-medium transition-all relative ${
-              currentSubTab === 'team-view'
-                ? 'text-[#0051d5] font-semibold'
-                : 'text-[#45464d] hover:text-[#0051d5]'
-            }`}
-          >
-            Team View
-            {currentSubTab === 'team-view' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0051d5]"></span>
-            )}
-          </button>
         </nav>
       </div>
 

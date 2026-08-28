@@ -1,5 +1,5 @@
 export type MainNavTab = 'research-hub' | 'document-library' | 'analysis-history' | 'conflict-reports' | 'settings';
-export type TopSubTab = 'active-files' | 'source-inspector' | 'team-view';
+export type TopSubTab = 'active-files' | 'source-inspector';
 
 export type DocumentStatus = 'indexed' | 'parsing' | 'error';
 export type DocumentFileType = 'pdf' | 'docx' | 'txt' | 'md' | 'csv';
@@ -87,17 +87,6 @@ export interface AnalysisHistoryItem {
   status: 'verified' | 'conflicts';
   messages: MessageItem[];
   conflictId?: string;
-}
-
-export interface TeamAnnotation {
-  id: string;
-  author: string;
-  avatar: string;
-  role: string;
-  timestamp: string;
-  targetRef: string;
-  comment: string;
-  status: 'open' | 'resolved';
 }
 
 export interface SystemServiceStatus {
