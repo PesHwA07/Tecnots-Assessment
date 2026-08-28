@@ -211,11 +211,7 @@ Tecnots-Assessment/
 │   ├── package.json            # Node.js dependencies
 │   └── index.html              # HTML entry point
 │
-├── frontend/                   # Legacy vanilla HTML/CSS/JS frontend (fallback)
-│   ├── index.html
-│   ├── styles.css
-│   └── app.js
-│
+
 ├── frontend-dist/              # Pre-built React production bundle (served by FastAPI)
 │   ├── index.html
 │   └── assets/
