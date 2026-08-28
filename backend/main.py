@@ -348,36 +348,21 @@ def _detect_document_scope(query: str) -> str | None:
 # Prefer the new React build if it exists, fallback to vanilla frontend
 _base_dir = os.path.dirname(__file__)
 react_dist_dir = os.path.join(_base_dir, "..", "frontend-dist")
-vanilla_frontend_dir = os.path.join(_base_dir, "..", "frontend")
 
-if os.path.exists(react_dist_dir):
-    # Serve React build assets (JS, CSS, etc.)
-    react_assets_dir = os.path.join(react_dist_dir, "assets")
-    if os.path.exists(react_assets_dir):
-        app.mount("/assets", StaticFiles(directory=react_assets_dir), name="assets")
+# Serve React build assets (JS, CSS, etc.)
+react_assets_dir = os.path.join(react_dist_dir, "assets")
+if os.path.exists(react_assets_dir):
+    app.mount("/assets", StaticFiles(directory=react_assets_dir), name="assets")
 
-    @app.get("/{full_path:path}")
-    async def serve_react_app(full_path: str):
-        """Serve React SPA — all non-API routes return index.html."""
-        # Try to serve the exact file first
-        file_path = os.path.join(react_dist_dir, full_path)
-        if full_path and os.path.isfile(file_path):
-            return FileResponse(file_path)
-        # Otherwise return index.html for client-side routing
-        index_path = os.path.join(react_dist_dir, "index.html")
-        if os.path.exists(index_path):
-            return FileResponse(index_path)
-        return {"message": "Corroborate API is running. Frontend not built yet."}
-else:
-    # Fallback: serve old vanilla frontend
-    if os.path.exists(vanilla_frontend_dir):
-        app.mount("/static", StaticFiles(directory=vanilla_frontend_dir), name="static")
-
-    @app.get("/")
-    async def serve_frontend():
-        """Serve the main frontend page."""
-        index_path = os.path.join(vanilla_frontend_dir, "index.html")
-        if os.path.exists(index_path):
-            return FileResponse(index_path)
-        return {"message": "Corroborate API is running. Frontend not found."}
-
+@app.get("/{full_path:path}")
+async def serve_react_app(full_path: str):
+    """Serve React SPA — all non-API routes return index.html."""
+    # Try to serve the exact file first
+    file_path = os.path.join(react_dist_dir, full_path)
+    if full_path and os.path.isfile(file_path):
+        return FileResponse(file_path)
+    # Otherwise return index.html for client-side routing
+    index_path = os.path.join(react_dist_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "Corroborate API is running. Frontend not built yet."}
