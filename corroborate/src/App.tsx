@@ -386,7 +386,7 @@ export const App: React.FC = () => {
               }}
               onOpenUploadModal={() => setIsUploadModalOpen(true)}
             />
-          ) : currentMainTab === 'conflict-reports' || currentSubTab === 'source-inspector' ? (
+          ) : currentMainTab === 'conflict-reports' ? (
             <ConflictReports
               conflicts={conflicts}
               documents={documents}
@@ -451,6 +451,12 @@ export const App: React.FC = () => {
         document={viewingDocument}
         highlightPhrase={viewerHighlight}
         onClose={() => setViewingDocument(null)}
+        onAskQuestion={(query) => {
+          setViewingDocument(null);
+          setCurrentMainTab('research-hub');
+          setCurrentSubTab('active-files');
+          handleSendMessage(query);
+        }}
       />
 
       <SettingsModal

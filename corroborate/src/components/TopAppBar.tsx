@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MainNavTab, TopSubTab } from '../types';
 
 interface TopAppBarProps {
@@ -20,10 +20,23 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
   onSearchChange,
   showSearch = false,
 }) => {
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<'none' | 'notifications' | 'share' | 'user'>('none');
   const [copied, setCopied] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setActiveDropdown('none');
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleDropdown = (dropdown: 'notifications' | 'share' | 'user') => {
+    setActiveDropdown((prev) => (prev === dropdown ? 'none' : dropdown));
+  };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -46,7 +59,8 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
           <div className="h-4 w-px bg-[#c6c6cd]/60"></div>
         </div>
 
-        <nav className="flex items-center gap-2 md:gap-4 h-full">
+        {(currentMainTab === 'research-hub' || currentMainTab === 'conflict-reports') && (
+          <nav className="flex items-center gap-2 md:gap-4 h-full">
           <button
             onClick={() => onSelectSubTab('active-files')}
             className={`px-3 py-5 text-sm font-medium transition-all relative ${
@@ -76,10 +90,11 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
           </button>
 
         </nav>
+        )}
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-3">
+      <div ref={containerRef} className="flex items-center gap-3">
         {showSearch && onSearchChange && (
           <div className="relative hidden md:block">
             <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[#76777d] text-[18px]">
@@ -108,7 +123,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
         {/* Notifications Button */}
         <div className="relative">
           <button
-            onClick={() => setShowNotifications(!showNotifications)}
+            onClick={() => toggleDropdown('notifications')}
             className="p-1.5 text-[#45464d] hover:text-[#0051d5] hover:bg-[#e5eeff] rounded-full transition-colors relative"
             title="Notifications"
           >
@@ -116,7 +131,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             <span className="absolute top-1 right-1 w-2 h-2 bg-[#BE123C] rounded-full"></span>
           </button>
 
-          {showNotifications && (
+          {activeDropdown === 'notifications' && (
             <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-[#c6c6cd] p-3 z-50 text-left">
               <div className="flex items-center justify-between pb-2 border-b border-[#c6c6cd]/50 mb-2">
                 <span className="font-semibold text-xs text-[#0b1c30]">Recent Verification Alerts</span>
@@ -149,14 +164,14 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
         {/* Share Button */}
         <div className="relative">
           <button
-            onClick={() => setShowShareModal(!showShareModal)}
+            onClick={() => toggleDropdown('share')}
             className="p-1.5 text-[#45464d] hover:text-[#0051d5] hover:bg-[#e5eeff] rounded-full transition-colors"
             title="Share Research Session"
           >
             <span className="material-symbols-outlined text-[20px]">share</span>
           </button>
 
-          {showShareModal && (
+          {activeDropdown === 'share' && (
             <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-[#c6c6cd] p-3.5 z-50 text-left">
               <div className="font-semibold text-xs text-[#0b1c30] mb-1">Share Verification Workspace</div>
               <p className="text-[#45464d] text-[11px] mb-3">
@@ -183,7 +198,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
         {/* User Profile Avatar */}
         <div className="relative">
           <button
-            onClick={() => setShowUserMenu(!showUserMenu)}
+            onClick={() => toggleDropdown('user')}
             className="w-8 h-8 rounded-full overflow-hidden border border-[#c6c6cd] hover:ring-2 hover:ring-[#0051d5] transition-all flex items-center justify-center bg-[#131b2e] text-white ml-1 cursor-pointer"
           >
             <img
@@ -193,9 +208,9 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             />
           </button>
 
-          {showUserMenu && (
+          {activeDropdown === 'user' && (
             <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-[#c6c6cd] p-3 z-50 text-left">
-              <div className="font-semibold text-xs text-[#0b1c30]">Dr. Elena Rostova</div>
+              <div className="font-semibold text-xs text-[#0b1c30]">Dhananjay Naiknaware</div>
               <div className="text-[11px] text-[#45464d]">Senior Legal Research Fellow</div>
               <div className="text-[10px] font-mono-data text-[#059669] mt-0.5">Workspace: Corp-Legal-Tier-1</div>
               <div className="border-t border-[#c6c6cd]/50 my-2 pt-1 text-xs space-y-1.5">

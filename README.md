@@ -18,7 +18,7 @@ Corroborate is an AI research assistant that ingests documents (PDF, TXT, Markdo
 | **Conversational Follow-Ups** | Maintains session context with LLM-powered coreference resolution |
 | **Document Scoping** | Queries mentioning a specific filename restrict retrieval to that document only |
 | **Session Export** | Download the full Q&A session as a structured Markdown report |
-| **React UI** | Modern multi-panel interface with Document Library, Research Hub, Conflict Reports, Analysis History, and Team Annotations |
+| **React UI** | Modern multi-panel interface with Document Library, Research Hub, Conflict Reports, and Analysis History |
 
 ---
 
@@ -204,7 +204,6 @@ Tecnots-Assessment/
 │   │       ├── TopAppBar.tsx           # Top navigation bar
 │   │       ├── UploadModal.tsx         # File upload dialog
 │   │       ├── DocumentViewerModal.tsx # Full document text viewer
-│   │       ├── TeamView.tsx            # Collaborative annotations
 │   │       ├── SettingsModal.tsx       # Configuration panel
 │   │       ├── SystemStatusModal.tsx   # Service health dashboard
 │   │       └── HelpCenterModal.tsx     # Help and documentation

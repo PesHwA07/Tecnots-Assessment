@@ -68,7 +68,7 @@ export const ResearchHub: React.FC<ResearchHubProps> = ({
       {/* Center Column: Chat Interface */}
       <section className="flex-1 flex flex-col min-w-0 bg-[#f8f9ff] relative border-r border-[#c6c6cd]/60">
         {/* Chat History */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:px-[12%] pb-64 space-y-8">
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:px-[12%] space-y-8">
           {messages.length === 0 ? (
             /* AI Introduction Hero */
             <div className="flex flex-col items-center justify-center text-center py-12 mb-6">
@@ -283,6 +283,8 @@ export const ResearchHub: React.FC<ResearchHubProps> = ({
             </div>
           )}
 
+          {/* Spacer to ensure the last message clears the fixed input area */}
+          <div className="h-48 flex-shrink-0" />
           <div ref={chatBottomRef} />
         </div>
 

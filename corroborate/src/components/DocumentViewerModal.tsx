@@ -5,12 +5,14 @@ interface DocumentViewerModalProps {
   document: DocumentItem | null;
   highlightPhrase?: string;
   onClose: () => void;
+  onAskQuestion?: (query: string) => void;
 }
 
 export const DocumentViewerModal: React.FC<DocumentViewerModalProps> = ({
   document,
   highlightPhrase = '',
   onClose,
+  onAskQuestion,
 }) => {
   const [searchTerm, setSearchTerm] = useState(highlightPhrase);
 
@@ -60,8 +62,13 @@ export const DocumentViewerModal: React.FC<DocumentViewerModalProps> = ({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Find in document..."
-                className="pl-8 pr-3 py-1 bg-white border border-[#c6c6cd] rounded text-xs text-[#0b1c30] w-48 focus:outline-none focus:border-[#0051d5]"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && searchTerm.trim() && onAskQuestion) {
+                    onAskQuestion(searchTerm.trim());
+                  }
+                }}
+                placeholder="Find in document... (Press Enter to Ask)"
+                className="pl-8 pr-3 py-1 bg-white border border-[#c6c6cd] rounded text-xs text-[#0b1c30] w-64 focus:outline-none focus:border-[#0051d5]"
               />
             </div>
             <button
