@@ -102,11 +102,10 @@ def rebuild_document_registry():
         for doc_id, chunks in doc_chunks.items():
             first_chunk = chunks[0]
             _documents[doc_id] = DocumentInfo(
-                doc_id=doc_id,
+                id=doc_id,
                 filename=first_chunk.get("doc_name", "unknown"),
                 file_type=os.path.splitext(first_chunk.get("doc_name", ""))[1] or ".txt",
                 chunk_count=len(chunks),
-                total_characters=sum(c.get("char_count", 0) for c in chunks),
             )
 
         if doc_chunks:
