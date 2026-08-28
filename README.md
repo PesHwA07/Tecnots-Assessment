@@ -1,4 +1,4 @@
-# DocuMind — AI Document Q&A Knowledge Assistant
+# Corroborate — AI Document Q&A Knowledge Assistant
 
 An AI-powered knowledge assistant that ingests documents (PDF, TXT, Markdown) and answers questions grounded strictly in the uploaded content. Features cross-document reasoning, conflict detection, source attribution with page-level precision, and conversational follow-ups.
 
@@ -39,8 +39,8 @@ Open **http://localhost:8000** in your browser.
 
 ```bash
 # Build and run with Docker
-docker build -t documind .
-docker run -p 8000:8000 --env-file .env documind
+docker build -t corroborate .
+docker run -p 8000:8000 --env-file .env corroborate
 ```
 
 ---

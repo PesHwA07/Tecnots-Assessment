@@ -1,4 +1,4 @@
-# 🚀 DocuMind — Setup & Run Guide
+# 🚀 Corroborate — Setup & Run Guide
 
 A step-by-step guide to get the AI Document Q&A Knowledge Assistant running on your machine.
 
@@ -96,8 +96,8 @@ cp .env.example .env
 ### Step 3: Build & Run
 
 ```bash
-docker build -t documind .
-docker run -p 8000:8000 --env-file .env documind
+docker build -t corroborate .
+docker run -p 8000:8000 --env-file .env corroborate
 ```
 
 ### Step 4: Open the App
