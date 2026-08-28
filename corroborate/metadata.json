@@ -1,7 +1,0 @@
-{
-  "name": "Corroborate",
-  "description": "AI Research Assistant for multi-document analysis, citation verification, and conflict detection.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
-
